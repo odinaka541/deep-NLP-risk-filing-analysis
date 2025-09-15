@@ -248,3 +248,112 @@ class RiskClassifier:
             return max(category_scores, key=category_scores.get)
         else:
             return 'other'
+
+# transformer-based model for risk analysis
+class RiskAnalysisDataset(Dataset):
+    def __init__(self, texts, labels, tokenizer, max_length=512):
+        self.texts = texts
+        self.labels = labels
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+    
+    def __len__(self):
+        return len(self.texts)
+    
+    def __getitem__(self, idx):
+        text = str(self.texts[idx])
+        label = self.labels[idx]
+        
+        encoding = self.tokenizer(
+            text,
+            truncation=True,
+            padding='max_length',
+            max_length=self.max_length,
+            return_tensors='pt'
+        )
+        
+        return {
+            'input_ids': encoding['input_ids'].flatten(),
+            'attention_mask': encoding['attention_mask'].flatten(),
+            'label': torch.tensor(label, dtype=torch.long)
+        }
+
+class TransformerRiskClassifier(nn.Module):
+    def __init__(self, model_name='bert-base-uncased', num_classes=7, dropout=0.3):
+        super(TransformerRiskClassifier, self).__init__()
+        
+        self.bert = AutoModel.from_pretrained(model_name)
+        self.dropout = nn.Dropout(dropout)
+        self.classifier = nn.Linear(self.bert.config.hidden_size, num_classes)
+        
+    def forward(self, input_ids, attention_mask):
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        pooled_output = outputs.pooler_output
+        output = self.dropout(pooled_output)
+        return self.classifier(output)
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!
+def train_transformer_model(model, train_loader, val_loader, num_epochs=3, learning_rate=2e-5):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.to(device)
+    
+    criterion = nn.CrossEntropyLoss()
+    optimizer = AdamW(model.parameters(), lr=learning_rate)
+    
+    total_steps = len(train_loader) * num_epochs
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer, num_warmup_steps=0, num_training_steps=total_steps
+    )
+    
+    train_losses = []
+    val_accuracies = []
+    
+    for epoch in range(num_epochs):
+        model.train()
+        total_train_loss = 0
+        
+        for batch in train_loader:
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+            labels = batch['label'].to(device)
+            
+            optimizer.zero_grad()
+            outputs = model(input_ids, attention_mask)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+            
+            total_train_loss += loss.item()
+        
+        # val
+        model.eval()
+        total_correct = 0
+        total_samples = 0
+        
+        with torch.no_grad():
+            for batch in val_loader:
+                input_ids = batch['input_ids'].to(device)
+                attention_mask = batch['attention_mask'].to(device)
+                labels = batch['label'].to(device)
+                
+                outputs = model(input_ids, attention_mask)
+                _, predicted = torch.max(outputs, 1)
+                
+                total_samples += labels.size(0)
+                total_correct += (predicted == labels).sum().item()
+        
+        avg_train_loss = total_train_loss / len(train_loader)
+        val_accuracy = total_correct / total_samples
+        
+        train_losses.append(avg_train_loss)
+        val_accuracies.append(val_accuracy)
+        
+        print(f'epoch {epoch+1}/{num_epochs}:')
+        print(f'  average training loss: {avg_train_loss:.4f}')
+        print(f'  validation accuracy: {val_accuracy:.4f}')
+    
+    return train_losses, val_accuracies
+
+
