@@ -81,3 +81,48 @@ class SECDataCollector:
         except Exception as e:
             print(f"error fetching filings for cik {cik}: {e}")
             return None
+
+    def parse_filing_links(self, xml_content):
+        """extracting document links from sec xml response"""
+        soup = BeautifulSoup(xml_content, 'xml')
+        filings = []
+        
+        for entry in soup.find_all('entry'):
+            filing_href = entry.find('filing-href')
+            filing_date = entry.find('filing-date')
+            
+            if filing_href and filing_date:
+                filings.append({
+                    'url': filing_href.text,
+                    'date': filing_date.text
+                })
+        
+        return filings
+    
+    def extract_document_url(self, filing_url):
+        try:
+            response = requests.get(filing_url, headers=self.headers)
+            response.raise_for_status()
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # looking for the main document link
+            for link in soup.find_all('a'):
+                if link.get('href') and '10-k' in link.get('href', '').lower():
+                    doc_url = urljoin(self.base_url, link['href'])
+                    return doc_url
+                    
+        except Exception as e:
+            print(f"error extracting document url: {e}")
+            
+        return None
+    
+    def download_document(self, doc_url):
+        try:
+            time.sleep(0.1)  # rate limiting
+            response = requests.get(doc_url, headers=self.headers)
+            response.raise_for_status()
+            return response.text
+        except Exception as e:
+            print(f"error downloading document: {e}")
+            return None
