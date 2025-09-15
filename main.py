@@ -197,3 +197,54 @@ class DocumentProcessor:
                     risk_sentences.append(sentence)
         
         return risk_sentences
+
+#
+class RiskClassifier:
+    def __init__(self):
+        self.risk_categories = {
+            'operational': [
+                'operations', 'operational', 'business', 'management', 'employees',
+                'key personnel', 'technology', 'systems', 'processes', 'supply chain',
+                'manufacturing', 'production', 'quality', 'safety'
+            ],
+            'financial': [
+                'financial', 'cash', 'liquidity', 'debt', 'credit', 'capital',
+                'funding', 'cash flow', 'revenue', 'profitability', 'costs',
+                'expenses', 'tax', 'accounting', 'auditing'
+            ],
+            'market': [
+                'market', 'competition', 'competitive', 'competitors', 'demand',
+                'customer', 'customers', 'pricing', 'economic', 'economy',
+                'recession', 'inflation', 'interest rates'
+            ],
+            'regulatory': [
+                'regulation', 'regulatory', 'compliance', 'legal', 'law', 'laws',
+                'government', 'policy', 'policies', 'sec', 'fda', 'environmental',
+                'litigation', 'lawsuit', 'patent', 'intellectual property'
+            ],
+            'technology': [
+                'technology', 'technological', 'cyber', 'cybersecurity', 'data',
+                'information', 'security', 'breach', 'hacking', 'software',
+                'hardware', 'internet', 'digital', 'innovation'
+            ],
+            'international': [
+                'international', 'global', 'foreign', 'overseas', 'currency',
+                'exchange', 'trade', 'tariff', 'political', 'geopolitical',
+                'country', 'countries', 'region', 'regional'
+            ]
+        }
+    
+    def classify_risk_sentence(self, sentence):
+        sentence_lower = sentence.lower()
+        
+        category_scores = {}
+        for category, keywords in self.risk_categories.items():
+            score = sum(1 for keyword in keywords if keyword in sentence_lower)
+            if score > 0:
+                category_scores[category] = score
+        
+        if category_scores:
+            # rturing the  category with highest score
+            return max(category_scores, key=category_scores.get)
+        else:
+            return 'other'
