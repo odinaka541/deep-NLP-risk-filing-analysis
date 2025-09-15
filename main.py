@@ -126,3 +126,74 @@ class SECDataCollector:
         except Exception as e:
             print(f"error downloading document: {e}")
             return None
+
+#
+class DocumentProcessor:
+    def __init__(self):
+        self.stop_words = set(stopwords.words('english'))
+        
+    def extract_risk_factors_section(self, html_content):
+        soup = BeautifulSoup(html_content, 'html.parser')
+        
+        # common patterns for risk factors section
+        risk_patterns = [
+            r'item\s*1a\s*[\.\-\s]*risk\s*factors',
+            r'risk\s*factors',
+            r'item\s*1a',
+        ]
+        
+        text = soup.get_text()
+        text = re.sub(r'\s+', ' ', text).lower()
+        
+        # finding risk factors section
+        for pattern in risk_patterns:
+            match = re.search(pattern, text)
+            if match:
+                start_pos = match.start()
+                
+                end_patterns = [
+                    r'item\s*1b',
+                    r'item\s*2\s*[\.\-\s]*properties',
+                    r'item\s*2[^a-z]'
+                ]
+                
+                end_pos = len(text)
+                for end_pattern in end_patterns:
+                    end_match = re.search(end_pattern, text[start_pos:])
+                    if end_match:
+                        end_pos = start_pos + end_match.start()
+                        break
+                
+                risk_section = text[start_pos:end_pos]
+                return self.clean_text(risk_section)
+        
+        return None
+    
+    def clean_text(self, text):
+        text = re.sub(r'\s+', ' ', text)
+        
+        text = re.sub(r'page\s+\d+', '', text)
+        text = re.sub(r'table\s+of\s+contents', '', text)
+
+        text = re.sub(r'[^\w\s\.\!\?\,\;\:\-\(\)]', '', text) # special chars
+        
+        return text.strip()
+    
+    def extract_risk_sentences(self, text):
+        sentences = sent_tokenize(text)
+        
+        # filterinh for sentences that likely contain risk information
+        risk_keywords = [
+            'risk', 'risks', 'uncertain', 'uncertainty', 'may', 'could', 
+            'might', 'potential', 'adverse', 'materially', 'significant',
+            'impact', 'affect', 'failure', 'inability', 'depends', 'dependent'
+        ]
+        
+        risk_sentences = []
+        for sentence in sentences:
+            if len(sentence.split()) > 10:
+                sentence_lower = sentence.lower()
+                if any(keyword in sentence_lower for keyword in risk_keywords):
+                    risk_sentences.append(sentence)
+        
+        return risk_sentences
