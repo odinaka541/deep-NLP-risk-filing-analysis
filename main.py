@@ -37,3 +37,7 @@ try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('stopwords')
+
+# set random seeds
+np.random.seed(42)
+torch.manual_seed(42)
