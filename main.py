@@ -41,3 +41,43 @@ except LookupError:
 # set random seeds
 np.random.seed(42)
 torch.manual_seed(42)
+
+# ---------------------------------------------------------
+
+class SECDataCollector:
+    def __init__(self):
+        """collect and parse sec 10-k filings from edgar database"""
+        self.base_url = "https://www.sec.gov"
+        self.headers = {
+            'User-Agent': 'research-project contact@university.edu'
+        }
+    
+    def get_company_filings(self, cik, form_type='10-K', count=5):
+        """
+        get recent filings for a company using
+            cik: company central index key
+            form_type: type of filing to retrieve
+            count: number of recent filings to get
+        """
+        # cik to 10 digits
+        cik_formatted = str(cik).zfill(10)
+        
+        # searching for filings
+        search_url = f"{self.base_url}/cgi-bin/browse-edgar"
+        params = {
+            'action': 'getcompany',
+            'CIK': cik_formatted,
+            'type': form_type,
+            'dateb': '',
+            'owner': 'exclude',
+            'count': count,
+            'output': 'xml'
+        }
+        
+        try:
+            response = requests.get(search_url, params=params, headers=self.headers)
+            response.raise_for_status()
+            return response.text
+        except Exception as e:
+            print(f"error fetching filings for cik {cik}: {e}")
+            return None

@@ -1,0 +1,17 @@
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+
+# nlp 
+nltk
+beautifulsoup4
+requests
+
+# dl and transformers
+torch
+transformers
+
+lxml
+html5lib
