@@ -1,0 +1,21 @@
+sentence,true_category,predicted_category,correct
+market consolidation could strengthen competitor positions,market,market,True
+safety regulations mandate expensive testing and certification,regulatory,regulatory,True
+intellectual property laws affect our ability to protect innovations,regulatory,regulatory,True
+foreign regulatory requirements create compliance complexity,international,regulatory,False
+geopolitical tensions could limit access to certain markets,international,market,False
+our business model relies on maintaining operational excellence,operational,market,False
+the company's technology infrastructure requires continuous investment and upgrades,technology,technology,True
+international tax treaties affect global tax strategy,international,regulatory,False
+labor disputes or shortages could disrupt our operations,operational,financial,False
+data loss incidents could damage customer relationships,technology,market,False
+debt covenant violations could accelerate payment obligations,financial,financial,True
+international trade disputes may result in tariffs or restrictions,international,financial,False
+international tax treaties affect global tax strategy,international,regulatory,False
+data breaches could result in significant costs and reputation damage,technology,technology,True
+we face credit risk from customers who may not pay amounts owed,financial,financial,True
+intellectual property theft could undermine competitive advantages,technology,market,False
+our success depends on accurately anticipating market trends,market,market,True
+we operate in highly competitive markets with pricing pressure,market,market,True
+cybersecurity threats could compromise sensitive data and systems,technology,technology,True
+healthcare regulations impact our product development and marketing,regulatory,regulatory,True

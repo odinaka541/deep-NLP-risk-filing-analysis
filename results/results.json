@@ -1,0 +1,24 @@
+{
+  "accuracy": 0.6808510638297872,
+  "num_classes": 6,
+  "total_sentences": 468,
+  "train_losses": [
+    1.7742260663132918,
+    1.5682204522584613,
+    1.3917461821907444
+  ],
+  "val_accuracies": [
+    0.29333333333333333,
+    0.5733333333333334,
+    0.6933333333333334
+  ],
+  "class_names": [
+    "financial",
+    "international",
+    "market",
+    "operational",
+    "regulatory",
+    "technology"
+  ],
+  "timestamp": "2025-09-22T11:13:38.426663"
+}

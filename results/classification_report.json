@@ -1,0 +1,51 @@
+{
+  "financial": {
+    "precision": 0.6666666666666666,
+    "recall": 0.9333333333333333,
+    "f1-score": 0.7777777777777778,
+    "support": 15.0
+  },
+  "international": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 15.0
+  },
+  "market": {
+    "precision": 0.5333333333333333,
+    "recall": 1.0,
+    "f1-score": 0.6956521739130435,
+    "support": 16.0
+  },
+  "operational": {
+    "precision": 1.0,
+    "recall": 0.375,
+    "f1-score": 0.5454545454545454,
+    "support": 16.0
+  },
+  "regulatory": {
+    "precision": 0.7272727272727273,
+    "recall": 1.0,
+    "f1-score": 0.8421052631578947,
+    "support": 16.0
+  },
+  "technology": {
+    "precision": 0.8,
+    "recall": 0.75,
+    "f1-score": 0.7741935483870968,
+    "support": 16.0
+  },
+  "accuracy": 0.6808510638297872,
+  "macro avg": {
+    "precision": 0.6212121212121212,
+    "recall": 0.6763888888888889,
+    "f1-score": 0.6058638847817264,
+    "support": 94.0
+  },
+  "weighted avg": {
+    "precision": 0.6273372018052868,
+    "recall": 0.6808510638297872,
+    "f1-score": 0.6104803740560419,
+    "support": 94.0
+  }
+}
